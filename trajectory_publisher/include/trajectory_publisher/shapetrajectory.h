@@ -26,7 +26,7 @@ private:
 public:
   shapetrajectory(int type);
   virtual ~shapetrajectory();
-  void initPrimitives(Eigen::Vector3d pos, Eigen::Vector3d axis, double omega);
+  void initPrimitives(Eigen::Vector3d pos, Eigen::Vector3d axis, double omega, Eigen::Vector3d size);
   void generatePrimitives(Eigen::Vector3d pos);
   void generatePrimitives(Eigen::Vector3d pos, Eigen::Vector3d vel);
   void generatePrimitives(Eigen::Vector3d pos, Eigen::Vector3d vel, Eigen::Vector3d jerk);

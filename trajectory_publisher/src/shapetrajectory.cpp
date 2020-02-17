@@ -3,6 +3,7 @@
 //
 
 #include "trajectory_publisher/shapetrajectory.h"
+#include <ros/ros.h>
 
 shapetrajectory::shapetrajectory(int type) :
   trajectory(),
@@ -23,13 +24,13 @@ shapetrajectory::~shapetrajectory(){
 
 };
 
-void shapetrajectory::initPrimitives(Eigen::Vector3d pos, Eigen::Vector3d axis, double omega){
+void shapetrajectory::initPrimitives(Eigen::Vector3d pos, Eigen::Vector3d axis, double omega, Eigen::Vector3d size){
   //Generate primitives based on current state for smooth trajectory
   traj_origin_ = pos;
   traj_omega_ = omega;
   T_ = 2*3.14 / traj_omega_;
   traj_axis_ = axis;
-  traj_radial_ << 2.0, 0.0, 0.0;
+  traj_radial_ << size;
 
 }
 
@@ -57,12 +58,13 @@ Eigen::Vector3d shapetrajectory::getPosition(double time){
 
   switch(type_) {
     case TRAJ_ZERO :
-
+      ROS_WARN_STREAM_ONCE("[Traj Publisher] Will publish zero trajectory");
       position << 0.0, 0.0, 0.0;
       break;
 
     case TRAJ_CIRCLE :
-
+      ROS_WARN_STREAM_ONCE("[Traj Publisher] Will publish circle trajectory with period of " << T_
+       << "[sec] & size of [" << traj_radial_.transpose() << "] m");
       theta = traj_omega_* time;
       position = std::cos(theta) * traj_radial_
                  + std::sin(theta) * traj_axis_.cross(traj_radial_)
@@ -71,15 +73,16 @@ Eigen::Vector3d shapetrajectory::getPosition(double time){
       break;
 
     case TRAJ_LAMNISCATE : //Lemniscate of Genero
-
+      ROS_WARN_STREAM_ONCE("[Traj Publisher] Will publish Leminiscate of Genero trajectory with period of " << T_
+       << " [sec] & size of [" << traj_radial_.transpose() << "] m");
       theta = traj_omega_* time;
       position = std::cos(theta) * traj_radial_
                  + std::sin(theta) * std::cos(theta) * traj_axis_.cross(traj_radial_)
                  + (1 - std::cos(theta)) * traj_axis_.dot(traj_radial_) * traj_axis_
                  + traj_origin_;
       break;
-    case TRAJ_STATIONARY : //Lemniscate of Genero
-
+    case TRAJ_STATIONARY : // Stationary
+      ROS_WARN_STREAM_ONCE("[Traj Publisher] Will publish stationary trajectory at" << traj_origin_.transpose());
       position = traj_origin_;
       break;
 
